@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from core.discord_client import bot
+from bot.main import bot 
 from core.config import DISCORD_CHANNEL_ID
 
 router = APIRouter()
