@@ -1,0 +1,16 @@
+# this a test folder
+actions/
+
+# Ignore Python bytecode files
+.venv/
+__pycache__/
+*/__pycache__/
+
+# Ignore Python virtual environments
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+.env
+dockerfile
+.dockerignore
