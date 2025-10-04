@@ -6,6 +6,7 @@ load_dotenv()
 # Discord configuration
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 DISCORD_CHANNEL_ID = int(os.getenv("DISCORD_CHANNEL_ID", 0))
+PREFIX = os.getenv("PREFIX", "!")
 
 print(f"Discord Token: {DISCORD_TOKEN}")
 

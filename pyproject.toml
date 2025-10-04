@@ -1,0 +1,18 @@
+[project]
+name = "naux-discord-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.12.15",
+    "discord-py>=2.6.3",
+    "fastapi>=0.118.0",
+    "httpx>=0.28.1",
+    "pydantic>=2.11.9",
+    "pynacl>=1.6.0",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.5",
+    "uvicorn>=0.37.0",
+    "yt-dlp>=2025.9.26",
+]
