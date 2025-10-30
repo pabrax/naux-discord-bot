@@ -1,25 +1,13 @@
-from discord.ext import commands
-from core.config import DISCORD_TOKEN, PREFIX
-from bot.commands.voice_channel import setup as setup_voice_channel
-import discord
+import sys
+import pathlib
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+# Ensure repo root is on sys.path so the 'bot' package is importable when run from repo root
+ROOT = pathlib.Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-@bot.event
-async def on_ready():
-    print(f"Bot is ready! Logged in as {bot.user}")
+from bot.main import main as run_bot
 
-@bot.event
-async def setup_hook():
-    print("Setting up hooks...")
-    await bot.load_extension("bot.commands.chat")
-    await bot.load_extension("bot.commands.discord_commands")
-    await bot.load_extension("bot.commands.voice_channel")
-
-def main():
-    bot.run(DISCORD_TOKEN)
 
 if __name__ == "__main__":
-    main()
+    run_bot()
