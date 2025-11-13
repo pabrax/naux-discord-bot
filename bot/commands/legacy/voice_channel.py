@@ -1,7 +1,8 @@
 import discord 
 from discord.ext import commands
 import yt_dlp
-import asyncio
+from bot.utils.music_player import extract_info, get_manager, play_next
+from bot.utils.ui_helpers import MusicControlView
 
 class VoiceChannel(commands.Cog):
     def __init__(self, bot):
@@ -18,35 +19,41 @@ class VoiceChannel(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *, url):
-        voice_client = ctx.voice_client
-        
-        if not voice_client:
-            await ctx.send("El bot no está conectado a un canal de voz.")
+        # Auto-conectar al canal de voz del autor si es necesario
+        if not ctx.author.voice or not ctx.author.voice.channel:
+            await ctx.send("Debes estar en un canal de voz para usar este comando.")
             return
 
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'noplaylist': True,
-            'quiet': True
-        }
-        
-        ffmpeg_options = {
-            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-            'options': '-vn'
-        }
+        voice_client = ctx.voice_client
+        if not voice_client:
+            try:
+                voice_client = await ctx.author.voice.channel.connect()
+            except Exception as e:
+                await ctx.send(f"No pude conectar al canal de voz: {e}")
+                return
 
+        info = await extract_info(url)
+        if not info:
+            await ctx.send("No pude extraer información del audio. Revisa la URL.")
+            return
+
+        guild_id = ctx.guild.id
+        get_manager().enqueue(guild_id, info)
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=False)
-                audio_url = info['url']
-                title = info.get('title', 'Audio')
+            print(f"[music] Enqueued: {info.get('title')} | audio_url: {info.get('url')}")
+        except Exception:
+            pass
 
-            source = discord.FFmpegPCMAudio(audio_url, **ffmpeg_options)
-            voice_client.play(source)
-            await ctx.send(f"Reproduciendo: {title}")
-            
-        except Exception as e:
-            await ctx.send(f"Error al reproducir audio: {str(e)}")
+        # If nothing is playing, start playback
+        vc = ctx.guild.voice_client
+        if not vc.is_playing() and not vc.is_paused():
+            title = await play_next(vc, guild_id)
+            if title:
+                view = MusicControlView(self.bot, guild_id, ctx.author)
+                await ctx.send(f"▶️ Reproduciendo: {title}", view=view)
+                return
+
+        await ctx.send(f"➕ Encolado: {info.get('title','Audio')}")
 
     @commands.command()
     async def disconnect(self, ctx):

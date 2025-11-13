@@ -1,5 +1,5 @@
 import httpx
-from core.config import ia_settings
+from bot.core.config import ia_settings
 
 
 async def query_groq(messages):
